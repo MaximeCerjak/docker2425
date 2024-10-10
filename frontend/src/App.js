@@ -62,7 +62,7 @@ function App() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            To-do List
+            Ma super To-do List
           </Typography>
         </Toolbar>
       </AppBar>

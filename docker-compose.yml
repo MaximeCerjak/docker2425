@@ -6,7 +6,6 @@ services:
     depends_on:
       - backend
     volumes:
-      # - ./frontend:/app/src 
       - shared-data:/shared
     command: npm start
     develop:
@@ -17,12 +16,8 @@ services:
           ignore:
             - node_modules
             - .git
-        - action: sync
-          path: ./frontend/public
-          target: /app/public
         - action: rebuild
-          path: ./frontend/package.json
-          target: /app/package.json
+          path: ./frontend
     networks:
       - api-network
 
@@ -44,7 +39,6 @@ services:
           path: ./backend/package.json
           target: /app/package.json
     volumes:
-      # - ./backend:/app
       - shared-data:/shared
       - created_volume:/volumes
     networks:

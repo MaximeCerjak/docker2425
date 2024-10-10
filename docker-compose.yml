@@ -1,0 +1,86 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    depends_on:
+      - backend
+    volumes:
+      # - ./frontend:/app/src 
+      - shared-data:/shared
+    command: npm start
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+          ignore:
+            - node_modules
+            - .git
+        - action: sync
+          path: ./frontend/public
+          target: /app/public
+        - action: rebuild
+          path: ./frontend/package.json
+          target: /app/package.json
+    networks:
+      - api-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT}:5000"
+    environment:
+      - MYSQL_HOST=db
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+          ignore:
+            - node_modules
+            - .git
+        - action: rebuild
+          path: ./backend/package.json
+          target: /app/package.json
+    volumes:
+      # - ./backend:/app
+      - shared-data:/shared
+      - created_volume:/volumes
+    networks:
+      - api-network
+      - app-network
+    secrets:
+      - mysql_user
+      - mysql_password
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - api-network
+    secrets:
+      - mysql_user
+      - mysql_password
+
+volumes:
+  db-data:
+  shared-data:
+  created_volume:
+
+networks:
+  app-network:
+  api-network:
+  test-network:
+
+secrets:
+  mysql_user:
+    file: ./secrets/mysql_user.txt
+  mysql_password:
+    file: ./secrets/mysql_password.txt

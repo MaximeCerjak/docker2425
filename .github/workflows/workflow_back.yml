@@ -1,4 +1,4 @@
-name: Workflow Frontend
+name: Workflow Backend
 
 on: [push]
 
